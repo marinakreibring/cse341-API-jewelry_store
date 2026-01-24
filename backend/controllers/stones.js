@@ -1,101 +1,147 @@
 const mongodb = require('../db/connect');
-const ObjectId = require('mongodb').ObjectId;
+const { ObjectId } = require('mongodb');
 
+/* GET ALL */
 const getAll = async (req, res) => {
   // #swagger.tags = ['Stones']
   try {
-  const result = await mongodb
+    const result = await mongodb
       .getDb()
       .db()
       .collection('stones')
       .find()
       .toArray();
 
-    res.setHeader('Content-Type', 'application/json');
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-  };
+};
 
+/* GET SINGLE */
 const getSingle = async (req, res) => {
   // #swagger.tags = ['Stones']
-  const itemId = new ObjectId(req.params.id);
-  const result = await mongodb
-    .getDb()
-    .db()
-    .collection('stones')
-    .findOne({ _id: itemId });
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid stone ID' });
+    }
 
-  res.status(200).json(result);
+    const itemId = new ObjectId(req.params.id);
+    const result = await mongodb
+      .getDb()
+      .db()
+      .collection('stones')
+      .findOne({ _id: itemId });
+
+    if (!result) {
+      return res.status(404).json({ message: 'Stone not found' });
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
-// Implementation for creating a new item
+
+/* CREATE */
 const createItem = async (req, res) => {
   // #swagger.tags = ['Stones']
-  const item = {
-    name: req.body.name,
-    color: req.body.color,
-    origin: req.body.origin,
-    chakra: req.body.chakra,
-    meaning: req.body.meaning,
-    element: req.body.element,
-    property: req.body.property,
-  };
-  const response = await mongodb
-    .getDb()
-    .db()
-    .collection('stones')
-    .insertOne(item);
-  if (response.acknowledged) {
+  try {
+    const { name, color, meaning } = req.body;
+
+    if (!name || !color || !meaning) {
+      return res.status(400).json({
+        message: 'Name, color, and meaning are required'
+      });
+    }
+
+    const item = {
+      name: req.body.name,
+      color: req.body.color,
+      origin: req.body.origin,
+      chakra: req.body.chakra,
+      meaning: req.body.meaning,
+      element: req.body.element,
+      property: req.body.property
+    };
+
+    const response = await mongodb
+      .getDb()
+      .db()
+      .collection('stones')
+      .insertOne(item);
+
     res.status(201).json(response);
-  } else {
-    res.status(500).json(response.error || 'Some error occurred while creating the item.');
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
-// Implementation for updating an item
+
+/* UPDATE */
 const updateItem = async (req, res) => {
   // #swagger.tags = ['Stones']
- const itemId = new ObjectId(req.params.id);
- const item = {
-    name: req.body.name,
-    color: req.body.color,
-    origin: req.body.origin,
-    chakra: req.body.chakra,
-    meaning: req.body.meaning,
-    element: req.body.element,
-    property: req.body.property,
- };
- const response = await mongodb.getDb()
-   .db()
-   .collection('stones')
-   .replaceOne({ _id: itemId }, item);
-  if (response.modifiedCount > 0) {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid stone ID' });
+    }
+
+    const itemId = new ObjectId(req.params.id);
+
+    const item = {
+      name: req.body.name,
+      color: req.body.color,
+      origin: req.body.origin,
+      chakra: req.body.chakra,
+      meaning: req.body.meaning,
+      element: req.body.element,
+      property: req.body.property
+    };
+
+    const response = await mongodb
+      .getDb()
+      .db()
+      .collection('stones')
+      .updateOne({ _id: itemId }, { $set: item });
+
+    if (response.matchedCount === 0) {
+      return res.status(404).json({ message: 'Stone not found' });
+    }
+
     res.status(204).send();
-  } else {
-    res.status(500).json(response.error || 'Some error occurred while updating the item.');
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-}; 
-// Implementation for deleting an item             
+};
+
+/* DELETE */
 const deleteItem = async (req, res) => {
   // #swagger.tags = ['Stones']
-  const itemId = new ObjectId(req.params.id);
-  const response = await mongodb.getDb()
-    .db()
-    .collection('stones')
-    .deleteOne({ _id: itemId });
-  console.log(response);  
-  if (response.deletedCount > 0) {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid stone ID' });
+    }
+
+    const itemId = new ObjectId(req.params.id);
+    const response = await mongodb
+      .getDb()
+      .db()
+      .collection('stones')
+      .deleteOne({ _id: itemId });
+
+    if (response.deletedCount === 0) {
+      return res.status(404).json({ message: 'Stone not found' });
+    }
+
     res.status(204).send();
-  } else {
-    res.status(500).json(response.error || 'Some error occurred while deleting the item.');
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-}
+};
 
-
-
-module.exports = { getAll, 
+module.exports = {
+  getAll,
   getSingle,
   createItem,
   updateItem,
   deleteItem
- };
+};
