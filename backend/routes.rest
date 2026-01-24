@@ -1,0 +1,38 @@
+### Returns all items from MongoDB
+GET http://localhost:8081/jewelry
+
+### Returns a single item by MongoDB ObjectId
+GET http://localhost:8081/jewelry/6974ad3fe708902b4c7d3e90
+
+### Creates a new item
+POST http://localhost:8081/jewelry
+Content-Type: application/json
+
+{    
+    "title": "Amethyst Dream",
+    "type": "Bracelet",
+    "price": 33.99,
+    "material": "Silver",
+    "stone": "Amethyst",
+    "stoneId": "6974aa27e708902b4c7d3e8c",
+    "handmade": true,
+    "inStock": true,
+    "description": "Handmade bracelet with natural amethyst crystals"
+}
+### Updates an existing item by MongoDB ObjectId
+PUT http://localhost:8081/jewelry/6974ad3fe708902b4c7d3e90
+Content-Type: application/json
+
+{
+    "title": "Amethyst Dream",
+    "type": "Bracelet",
+    "price": 25.99,
+    "material": "Silver",
+    "stone": "Amethyst",
+    "stoneId": "6974aa27e708902b4c7d3e8c",
+    "handmade": true,
+    "inStock": true,
+    "description": "Handmade bracelet with natural amethyst crystals"
+}
+### Deletes a professional document by MongoDB ObjectId
+DELETE http://localhost:8081/jewelry/6974ad3fe708902b4c7d3e90
