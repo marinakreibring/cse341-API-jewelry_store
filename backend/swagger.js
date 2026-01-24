@@ -5,7 +5,7 @@ const doc = {
         title: 'Jewelry Store API',
         description: 'API for jewelry store items'
     },
-    host: process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost:8081',
+    host: 'localhost:8081',
     schemes: ['http', 'https']
 };
 const outputFile = './swagger-output.json';
