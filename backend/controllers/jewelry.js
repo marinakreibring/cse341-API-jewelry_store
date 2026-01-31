@@ -46,6 +46,7 @@ const getSingle = async (req, res) => {
 /* CREATE */
 const createItem = async (req, res) => {
   // #swagger.tags = ['Jewelry']
+  // #swagger.security = [{ "BearerAuth": [] }]
   try {
     const { title, type, price } = req.body;
 
@@ -81,6 +82,7 @@ const createItem = async (req, res) => {
 /* UPDATE */
 const updateItem = async (req, res) => {
   // #swagger.tags = ['Jewelry']
+  // #swagger.security = [{ "BearerAuth": [] }]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: 'Invalid jewelry ID' });
@@ -118,6 +120,7 @@ const updateItem = async (req, res) => {
 /* DELETE */
 const deleteItem = async (req, res) => {
   // #swagger.tags = ['Jewelry']
+  // #swagger.security = [{ "BearerAuth": [] }]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: 'Invalid jewelry ID' });
