@@ -5,7 +5,7 @@
     "description": "API for jewelry store items",
     "version": "1.0.0"
   },
-  "host": "localhost:8081",
+  "host": "cse341-api-jewelry-store.onrender.com",
   "basePath": "/",
   "schemes": [
     "http",
