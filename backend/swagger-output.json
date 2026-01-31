@@ -7,10 +7,7 @@
   },
   "host": "cse341-api-jewelry-store.onrender.com",
   "basePath": "/",
-  "schemes": [
-    "http",
-    "https"
-  ],
+  "schemes": ["https"],
   "paths": {
     "/": {
       "get": {
