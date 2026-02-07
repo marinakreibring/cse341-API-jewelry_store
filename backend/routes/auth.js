@@ -1,36 +1,43 @@
 const router = require('express').Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const mongodb = require('../db/connect');
+const passport = require('passport');
 
-// REGISTER
-router.post('/register', async (req, res) => {
-  const { email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
+// start github login
+router.get('/github', 
+  // #swagger.tags = ['Auth']
+  passport.authenticate('github', { scope: ['user:email'] }));
 
-  const user = { email, password: hashedPassword };
+// github callback
+router.get(
+  '/github/callback',
+  // #swagger.tags = ['Auth']
+  passport.authenticate('github', {
+    failureRedirect: '/login-failed'
+  }),
+  (req, res) => {
+    res.redirect('/auth/login-success');
+  }
+);
 
-  const result = await mongodb.getDb().db().collection('users').insertOne(user);
-  res.status(201).json({ message: 'User created' });
+// logout
+router.get('/logout', 
+  // #swagger.tags = ['Auth']
+  (req, res, next) => {
+  req.logout(err => {
+    if (err) return next(err);
+    res.json({ message: 'Logged out successfully' });
+  });
 });
 
-// LOGIN
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+// success / failure helpers
+router.get('/login-success', (req, res) => {
+  res.json({
+    message: 'Login successful',
+    user: req.user
+  });
+});
 
-  const user = await mongodb.getDb().db().collection('users').findOne({ email });
-  if (!user) return res.status(401).json({ message: 'Invalid credentials' });
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
-
-  const token = jwt.sign(
-    { userId: user._id, email: user.email },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  res.json({ token });
+router.get('/login-failed', (req, res) => {
+  res.status(401).json({ message: 'Login failed' });
 });
 
 module.exports = router;

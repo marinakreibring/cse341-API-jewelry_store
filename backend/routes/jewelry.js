@@ -9,11 +9,13 @@ router.get('/', jewelryController.getAll);
 // GET jewelry by id
 router.get('/:id', jewelryController.getSingle);
 
-// CREATE new jewelry, protected route
-router.post('/', authenticate, jewelryController.createItem);
+const { validateJewelry } = require('../validation/jewelryvalidator');
 
-// UPDATE jewelry by id, protected route
-router.put('/:id', authenticate, jewelryController.updateItem);
+// CREATE new jewelry
+router.post('/', authenticate, validateJewelry, jewelryController.createItem);
+
+// UPDATE jewelry by id
+router.put('/:id', authenticate, validateJewelry, jewelryController.updateItem);
 
 // DELETE jewelry by id, protected route
 router.delete('/:id', authenticate, jewelryController.deleteItem);

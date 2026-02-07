@@ -1,28 +1,36 @@
 require('dotenv').config();
+require('./auth/github');
 const express = require('express');
 const bodyParser = require('body-parser');
-const MongoClient = require('mongodb').MongoClient;
+const session = require('express-session');
+const passport = require('passport');
+const cors = require('cors');
+
+
 const mongodb = require('./db/connect');
+
+require('./auth/github');
 
 const port = process.env.PORT || 8081;
 const app = express();
 
 app
   .use(bodyParser.json())
-  .use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    next();
-  })
+  .use(cors())
+  .use(
+    session({
+      secret: process.env.SESSION_SECRET,
+      resave: false,
+      saveUninitialized: false
+    })
+  )
+  .use(passport.initialize())
+  .use(passport.session())
   .use('/', require('./routes'));
 
-
-
-mongodb.initDb((err, mongodb) => {
-  if (err) {
-    console.log(err);
-  } else {
+mongodb.initDb((err) => {
+  if (err) console.log(err);
+  else {
     app.listen(port);
     console.log(`Connected to DB and listening on ${port}`);
   }

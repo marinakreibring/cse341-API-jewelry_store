@@ -46,6 +46,7 @@ const getSingle = async (req, res) => {
 /* CREATE */
 const createItem = async (req, res) => {
   // #swagger.tags = ['Stones']
+  // #swagger.description = 'Create a new stone (OAuth protected)'
   try {
     const { name, color, meaning } = req.body;
 
@@ -80,6 +81,7 @@ const createItem = async (req, res) => {
 /* UPDATE */
 const updateItem = async (req, res) => {
   // #swagger.tags = ['Stones']
+  // #swagger.description = 'Update a stone by ID (OAuth protected)'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: 'Invalid stone ID' });
@@ -116,6 +118,7 @@ const updateItem = async (req, res) => {
 /* DELETE */
 const deleteItem = async (req, res) => {
   // #swagger.tags = ['Stones']
+  // #swagger.description = 'Delete a stone by ID (OAuth protected)'
   try {
     if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: 'Invalid stone ID' });
